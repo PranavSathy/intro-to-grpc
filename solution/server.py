@@ -15,10 +15,19 @@ _JWT_SECRET = 'grpc_rules'
 class Authenticator(authenticator_pb2_grpc.AuthenticatorServicer):
 
   def Login(self, request, context):
-	# Insert logic for Login.
+    	profile = {
+		'username': request.username,
+		'last_logged_in': datetime.now().isoformat()
+	}
+	encoded = jwt.encode(profile, _JWT_SECRET, algorithm='HS256')
+	return authenticator_pb2.LoginResponse(jwt=encoded)
 
   def Profile(self, request, context):
-	# Insert logic for Profile.
+	profile = jwt.decode(request.jwt, _JWT_SECRET, algorithms=['HS256'])
+	res = authenticator_pb2.ProfileResponse()
+	res.username = profile['username']
+	res.last_logged_in.FromDatetime(dateutil.parser.parse(profile['last_logged_in']))
+	return res
 
 def serve():
   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
