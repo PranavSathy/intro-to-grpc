@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package authenticator;
+
+import "google/protobuf/timestamp.proto";
+
+service Authenticator {
+	rpc Login (LoginRequest) returns (LoginResponse) {}
+	rpc Profile (ProfileRequest) returns (ProfileResponse) {}
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string jwt = 1;
+}
+
+message ProfileRequest {
+  string jwt = 1;
+}
+
+message ProfileResponse {
+  string username = 1;
+  google.protobuf.Timestamp last_logged_in = 2;
+}
